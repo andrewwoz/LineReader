@@ -6,20 +6,21 @@ import Foundation
 
 class StreamReader {
     
-    let encoding:UInt
+    let encoding:String.Encoding
     let chunkSize: Int
     
-    var fileHandle:NSFileHandle!
+    var fileHandle:FileHandle!
     let buffer:NSMutableData!
     let delimData:NSData!
     var atEOF:Bool = false
     
     
-    init?(path:String, delimiter:String = "\n", encoding:UInt = NSUTF8StringEncoding, chunkSize:Int = 2048){
+    
+    init?(path:String, delimiter:String = "\n", encoding:String.Encoding = .utf8 , chunkSize:Int = 2048){
         self.encoding = encoding
         self.chunkSize = chunkSize
         
-        if let fileHandle = NSFileHandle(forReadingAtPath: path) {
+        if let fileHandle = FileHandle(forReadingAtPath: path) {
             self.fileHandle = fileHandle
         }else{
             return nil
@@ -31,8 +32,8 @@ class StreamReader {
             return nil
         }
         
-        if let delimData = delimiter.dataUsingEncoding(encoding) {
-            self.delimData = delimData
+        if let delimData = delimiter.data(using: encoding) {
+            self.delimData = delimData as NSData!
         }else{
             return nil
         }
@@ -47,38 +48,38 @@ class StreamReader {
         if atEOF {
             return nil
         }
-
+        
         // Read data chunks from file until a line delimiter is found:
-        var range = buffer.rangeOfData(delimData, options: nil, range: NSMakeRange(0, buffer.length))
+        var range = buffer.range(of: delimData as Data, options: .init(rawValue: 0), in: NSMakeRange(0, buffer.length))
         while range.location == NSNotFound {
-            var tmpData = fileHandle.readDataOfLength(chunkSize)
-            if tmpData.length == 0 {
+            var tmpData = fileHandle.readData(ofLength: chunkSize)
+            if tmpData.count == 0 {
                 // EOF or read error.
                 atEOF = true
                 if buffer.length > 0 {
                     // Buffer contains last line in file (not terminated by delimiter).
-                    let line = NSString(data: buffer, encoding: encoding);
+                    let line = NSString(data: buffer as Data, encoding: encoding.rawValue);
                     buffer.length = 0
-                    return line
+                    return line as String?
                 }
                 // No more lines.
                 return nil
             }
-            buffer.appendData(tmpData)
-            range = buffer.rangeOfData(delimData, options: nil, range: NSMakeRange(0, buffer.length))
+            buffer.append(tmpData)
+            range = buffer.range(of: delimData as Data, options: .init(rawValue: 0), in: NSMakeRange(0, buffer.length))
         }
         
         // Convert complete line (excluding the delimiter) to a string:
-        let line = NSString(data: buffer.subdataWithRange(NSMakeRange(0, range.location)),
-            encoding: encoding)
+        let line = NSString(data: buffer.subdata(with: NSMakeRange(0, range.location)),
+                            encoding: encoding.rawValue)
         // Remove line (and the delimiter) from the buffer:
-        buffer.replaceBytesInRange(NSMakeRange(0, range.location + range.length), withBytes: nil, length: 0)
+        buffer.replaceBytes(in: NSMakeRange(0, range.location + range.length), withBytes: nil, length: 0)
         
-        return line
+        return line as String?
     }
     
     func rewind() {
-        fileHandle.seekToFileOffset(0)
+        fileHandle.seek(toFileOffset: 0)
         buffer.length = 0
         atEOF = false
     }
@@ -94,9 +95,9 @@ class StreamReader {
 
 
 
-extension StreamReader : SequenceType {
-    func generate() -> GeneratorOf<String> {
-        return GeneratorOf<String> {
+extension StreamReader : Sequence {
+    func makeIterator() -> AnyIterator<String> {
+        return AnyIterator<String> {
             return self.nextLine()
         }
     }
@@ -111,7 +112,7 @@ extension StreamReader {
             let prevOffset = fileHandle.offsetInFile
             fileHandle.seekToEndOfFile()
             let size = fileHandle.offsetInFile
-            fileHandle.seekToFileOffset(prevOffset)
+            fileHandle.seek(toFileOffset: prevOffset)
             return size
         }
         
