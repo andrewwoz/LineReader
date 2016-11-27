@@ -3,18 +3,17 @@
 
 import Foundation
 
-
+/// Read file line by line separated by delimiter
 class StreamReader {
     
     let encoding:String.Encoding
     let chunkSize: Int
+    let delimData: Data!
     
-    var fileHandle:FileHandle!
-    let buffer:NSMutableData!
-    let delimData:NSData!
-    var atEOF:Bool = false
+    fileprivate var fileHandle:FileHandle!
+    fileprivate var buffer:Data!
     
-    
+    fileprivate var atEOF:Bool = false
     
     init?(path:String, delimiter:String = "\n", encoding:String.Encoding = .utf8 , chunkSize:Int = 2048){
         self.encoding = encoding
@@ -26,61 +25,55 @@ class StreamReader {
             return nil
         }
         
-        if let buffer = NSMutableData(capacity: chunkSize) {
-            self.buffer = buffer
-        }else{
-            return nil
-        }
+        self.buffer = Data(capacity: chunkSize)
+        
         
         if let delimData = delimiter.data(using: encoding) {
-            self.delimData = delimData as NSData!
+            self.delimData = delimData
         }else{
             return nil
         }
     }
     
-    deinit{
-        self.close()
-    }
-    
-    func nextLine() -> String? {
+    fileprivate func nextLine() -> String? {
         
         if atEOF {
             return nil
         }
         
         // Read data chunks from file until a line delimiter is found:
-        var range = buffer.range(of: delimData as Data, options: .init(rawValue: 0), in: NSMakeRange(0, buffer.length))
-        while range.location == NSNotFound {
+        var range = buffer.range(of: delimData, options: .init(rawValue: 0), in: 0..<buffer.count)
+        while range == nil {
             var tmpData = fileHandle.readData(ofLength: chunkSize)
             if tmpData.count == 0 {
                 // EOF or read error.
                 atEOF = true
-                if buffer.length > 0 {
+                if buffer.count > 0 {
                     // Buffer contains last line in file (not terminated by delimiter).
-                    let line = NSString(data: buffer as Data, encoding: encoding.rawValue);
-                    buffer.length = 0
-                    return line as String?
+                    
+                    let line = String(bytes: buffer, encoding: encoding)
+                    buffer.count = 0
+                    return line
                 }
                 // No more lines.
                 return nil
             }
             buffer.append(tmpData)
-            range = buffer.range(of: delimData as Data, options: .init(rawValue: 0), in: NSMakeRange(0, buffer.length))
+            range = buffer.range(of: delimData , options: .init(rawValue: 0), in: 0..<buffer.count)
         }
         
         // Convert complete line (excluding the delimiter) to a string:
-        let line = NSString(data: buffer.subdata(with: NSMakeRange(0, range.location)),
-                            encoding: encoding.rawValue)
-        // Remove line (and the delimiter) from the buffer:
-        buffer.replaceBytes(in: NSMakeRange(0, range.location + range.length), withBytes: nil, length: 0)
+        let line = String(bytes: buffer.subdata(in: 0..<range!.lowerBound), encoding: encoding)
         
-        return line as String?
+        // Remove line (and the delimiter) from the buffer:
+        buffer.resetBytes(in: 0..<(range!.lowerBound + range!.count))
+        
+        return line
     }
     
     func rewind() {
         fileHandle.seek(toFileOffset: 0)
-        buffer.length = 0
+        buffer.count = 0
         atEOF = false
     }
     
@@ -91,7 +84,11 @@ class StreamReader {
         }
     }
     
+    deinit{
+        close()
+    }
 }
+
 
 
 
@@ -110,8 +107,7 @@ extension StreamReader {
     var fileSize:UInt64? {
         if  fileHandle != nil{
             let prevOffset = fileHandle.offsetInFile
-            fileHandle.seekToEndOfFile()
-            let size = fileHandle.offsetInFile
+            let size = fileHandle.seekToEndOfFile()
             fileHandle.seek(toFileOffset: prevOffset)
             return size
         }
