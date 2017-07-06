@@ -2,7 +2,7 @@
 ### Efficient way to read text file line by line
 [![platform](https://img.shields.io/badge/platform-osx%20%7C%20ios%20%7C%20watchos%20%7C%20tvos%20-lightgrey.svg)]()
 [![platform-ubuntu](https://img.shields.io/badge/platform-ubuntu-lightgrey.svg)]()
-[![swift](https://img.shields.io/badge/swift-3.0.1-yellow.svg)]()
+[![swift](https://img.shields.io/badge/swift-3.1-yellow.svg)]()
 
 
 ## Example
