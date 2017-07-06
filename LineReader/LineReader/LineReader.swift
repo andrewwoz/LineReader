@@ -3,8 +3,8 @@
 import Foundation
 
 /// Read text file line by line
-class LineReader {
-    let path: String
+public class LineReader {
+    public let path: String
     
     fileprivate let file: UnsafeMutablePointer<FILE>!
     
@@ -17,7 +17,7 @@ class LineReader {
         
     }
     
-    var nextLine: String? {
+    public var nextLine: String? {
         var line:UnsafeMutablePointer<CChar>? = nil
         var linecap:Int = 0
         defer { free(line) }
@@ -30,7 +30,7 @@ class LineReader {
 }
 
 extension LineReader: Sequence {
-    func  makeIterator() -> AnyIterator<String> {
+    public func  makeIterator() -> AnyIterator<String> {
         return AnyIterator<String> {
             return self.nextLine
         }
