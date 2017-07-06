@@ -5,7 +5,7 @@
 [![swift](https://img.shields.io/badge/swift-3.0.1-yellow.svg)]()
 
 
-## Usage
+## Example
 
 Suppose we have file with such content
 ```
@@ -49,6 +49,11 @@ Output
 >8010066,,Bützow,,53.8368140,11.9977410,,,0,
 
 ```
+
+## How to use
+
+Add `LineReader.swift` file to your project.
+
 License
 -----
 [MIT License](http://opensource.org/licenses/MIT)
