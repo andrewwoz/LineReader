@@ -1,4 +1,4 @@
-// Copyright © 2016 andrewwoz
+// Copyright © 2017 andrewwoz
 
 import Foundation
 
@@ -10,11 +10,8 @@ public class LineReader {
     
     init?(path: String) {
         self.path = path
-        
         file = fopen(path, "r")
-        
         guard file != nil else { return nil }
-        
     }
     
     public var nextLine: String? {
