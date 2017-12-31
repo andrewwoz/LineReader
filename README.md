@@ -3,7 +3,7 @@
 
 [![platform](https://img.shields.io/badge/platform-osx%20%7C%20ios%20%7C%20watchos%20%7C%20tvos%20-lightgrey.svg)]()
 [![platform-ubuntu](https://img.shields.io/badge/platform-ubuntu-lightgrey.svg)]()
-[![swift](https://img.shields.io/badge/swift-3.1-yellow.svg)]()
+[![swift](https://img.shields.io/badge/swift-4.0-yellow.svg)]()
 
 ## Benefits of using `LineReader`:
 - You can use it on iOS, macOS, Ubuntu
