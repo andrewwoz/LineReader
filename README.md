@@ -55,6 +55,25 @@ Output
 
 ```
 
+### Tip
+
+If you see high memory usage with large files, use `autoreleasepool` block
+
+```swift
+
+guard let reader = LineReader(path: "/Path/to/file.txt") else {
+    return; // cannot open file
+}
+
+for line in reader {
+    autoreleasepool {
+        print(">" + line.trimmingCharacters(in: .whitespacesAndNewlines))
+    }
+}
+
+```
+
+
 ## How to use
 
 Add `LineReader.swift` file to your project.
