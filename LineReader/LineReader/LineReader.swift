@@ -2,7 +2,7 @@
 
 import Foundation
 
-/// Read text file line by line
+/// Read text file line by line in efficient way
 public class LineReader {
     public let path: String
     
