@@ -30,7 +30,7 @@ Another day, another dollar.
 An ounce of prevention is worth a pound of cure
 ```
 
-Read it line by line with `\n` delimiter, utf8 endcoding and chunkSize of 1024
+Read it line by line with `\n` delimiter
 
 ```swift
 guard let reader = LineReader(path: "/Path/to/file.txt") else {
