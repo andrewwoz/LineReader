@@ -50,6 +50,18 @@ Output
 Longest line has 61 characters
 ```
 
+## Example 2
+
+```swift
+guard let reader = LineReader(path: "/Path/to/file.txt") else {
+    throw NSError(domain: "FileNotFound", code: 404, userInfo: nil)
+}
+
+for line in reader {
+    Database.save(line)
+}
+```
+
 ### Tip
 
 If you see high memory usage with large files, use `autoreleasepool` block
