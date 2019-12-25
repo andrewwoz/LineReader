@@ -8,14 +8,14 @@
 
 import Foundation
 
-let x = LineReader(path: "<#path to file#>")
-
-guard let reader = x else {
+guard let reader = LineReader(path: <#file path#>) else {
     throw NSError(domain: "FileNotFound", code: 404, userInfo: nil)
 }
 
+let longestLine = reader.reduce(0, {longestLine, line in
+  return longestLine < line.count ? line.count : longestLine
+})
 
-for line in reader {
-    print(line)
-}
+print("Longest line has \(longestLine) characters")
+
 
