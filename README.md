@@ -14,45 +14,40 @@
 
 Suppose we have file with such content
 ```
-stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station
-5100083,,Kunowice,,52.3430780,14.6425210,,,0,
-5189954,,Swinoujscie Centrum,,53.9129970,14.2360010,,,0,
-5193610,,Slubice,,52.3415210,14.6183230,,,0,
-8003774,,Lübeck St Jürgen,,53.8423750,10.7008680,,,0,
-8010046,,Beucha,,51.3236210,12.5731330,,,0,
-8010051,,Blankenberg(Meckl),,53.7723090,11.7152900,,,0,
-8010059,,Borsdorf(Sachs),,51.3457250,12.5409000,,,0,
-8010066,,Bützow,,53.8368140,11.9977410,,,0,
-
+All the world loves a lover
+All things come to those who wait
+All things must pass
+All work and no play makes Jack a dull boy
+All you need is love
+All is fair in love and war
+All is for the best in the best of all possible worlds
+All is well that ends well
+An apple a day keeps the doctor away
+An army marches on its stomach.
+An eye for an eye makes the whole world blind.
+An Englishman's home is his castle/A man's home is his castle
+Another day, another dollar.
+An ounce of prevention is worth a pound of cure
 ```
 
 Read it line by line with `\n` delimiter, utf8 endcoding and chunkSize of 1024
 
 ```swift
-
 guard let reader = LineReader(path: "/Path/to/file.txt") else {
-    return; // cannot open file
+    throw NSError(domain: "FileNotFound", code: 404, userInfo: nil)
 }
 
-for line in reader {
-    print(">" + line.trimmingCharacters(in: .whitespacesAndNewlines))      
-}
- 
+let longestLine = reader.reduce(0, { longestLine, line in
+  return longestLine < line.count ? line.count : longestLine
+})
+
+print("Longest line has \(longestLine) characters")
 ```
 
 Output
 
 ```
->stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station
->5100083,,Kunowice,,52.3430780,14.6425210,,,0,
->5189954,,Swinoujscie Centrum,,53.9129970,14.2360010,,,0,
->5193610,,Slubice,,52.3415210,14.6183230,,,0,
->8003774,,Lübeck St Jürgen,,53.8423750,10.7008680,,,0,
->8010046,,Beucha,,51.3236210,12.5731330,,,0,
->8010051,,Blankenberg(Meckl),,53.7723090,11.7152900,,,0,
->8010059,,Borsdorf(Sachs),,51.3457250,12.5409000,,,0,
->8010066,,Bützow,,53.8368140,11.9977410,,,0,
-
+Longest line has 61 characters
 ```
 
 ### Tip
@@ -67,7 +62,7 @@ guard let reader = LineReader(path: "/Path/to/file.txt") else {
 
 for line in reader {
     autoreleasepool {
-        print(">" + line.trimmingCharacters(in: .whitespacesAndNewlines))
+       // Do some heavy processing here
     }
 }
 
