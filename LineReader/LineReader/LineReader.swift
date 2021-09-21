@@ -17,7 +17,7 @@ public class LineReader {
     public var nextLine: String? {
         var line:UnsafeMutablePointer<CChar>? = nil
         var linecap:Int = 0
-        defer { free(line) }
+        defer { if (line != nil) { free(line!) } }
         return getline(&line, &linecap, file) > 0 ? String(cString: line!) : nil
     }
     
